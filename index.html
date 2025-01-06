@@ -128,7 +128,7 @@
         async function fetchMovies(date) {
             toggleLoading(true);
             try {
-                const response = await axios.get(`/data/${date}.json`);
+                const response = await axios.get(`data/${date}.json`);
                 currentMovies = response.data; // Update the current movies
                 updateTable(currentMovies);
             } catch (error) {
