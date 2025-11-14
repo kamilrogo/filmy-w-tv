@@ -285,22 +285,28 @@
 
         function generateDates() {
             const dates = [];
-            console.log("--- generateDates() START ---");
-            console.log("today (normalized):", today.toISOString());
-            console.log("today.getFullYear():", today.getFullYear());
-            console.log("today.getMonth():", today.getMonth());
-            console.log("today.getDate():", today.getDate());
+            // console.log("--- generateDates() START ---");
+            // console.log("today (normalized):", today.toISOString());
+            // console.log("today.getFullYear():", today.getFullYear());
+            // console.log("today.getMonth():", today.getMonth());
+            // console.log("today.getDate():", today.getDate());
 
             for (let i = -3; i <= 3; i++) {
                 const date = new Date(today.getTime()); // Create a copy of today's timestamp
-                console.log(`  i=${i}: date (copy of today) before setDate:`, date.toISOString());
+                // console.log(`  i=${i}: date (copy of today) before setDate:`, date.toISOString());
                 date.setDate(date.getDate() + i); // Add 'i' days to this copy
-                const formattedDate = date.toISOString().split('T')[0];
-                console.log(`  i=${i}: date after setDate:`, date.toISOString());
-                console.log(`  i=${i}: formattedDate:`, formattedDate);
+                
+                // Format date to YYYY-MM-DD using local date components
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+                const day = String(date.getDate()).padStart(2, '0');
+                const formattedDate = `${year}-${month}-${day}`;
+
+                // console.log(`  i=${i}: date after setDate:`, date.toISOString());
+                // console.log(`  i=${i}: formattedDate:`, formattedDate);
                 dates.push({ value: formattedDate });
             }
-            console.log("--- generateDates() END ---");
+            // console.log("--- generateDates() END ---");
             return dates;
         }
 
