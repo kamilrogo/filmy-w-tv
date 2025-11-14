@@ -5,26 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Filmy w TV</title>
     <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --container-bg: #fff;
+            --h1-color: #2c3e50;
+            --tab-btn-bg: #e0e0e0;
+            --tab-btn-color: #555;
+            --tab-btn-hover-bg: #c0c0c0;
+            --tab-btn-active-bg: #007bff;
+            --tab-btn-active-color: white;
+            --spinner-border-top: #007bff;
+            --table-bg: #fff;
+            --table-header-bg: #f8f9fa;
+            --table-header-color: #495057;
+            --table-border-color: #eee;
+            --table-row-hover-bg: #f1f1f1;
+            --search-border: #ccc;
+            --search-focus-border: #007bff;
+            --switch-bg: #ccc;
+            --switch-slider-bg: #fff;
+            --switch-checked-bg: #007bff;
+        }
+
+        body.dark-mode {
+            --bg-color: #2c2c2c;
+            --text-color: #e0e0e0;
+            --container-bg: #3c3c3c;
+            --h1-color: #f0f0f0;
+            --tab-btn-bg: #555;
+            --tab-btn-color: #e0e0e0;
+            --tab-btn-hover-bg: #666;
+            --tab-btn-active-bg: #0056b3;
+            --tab-btn-active-color: white;
+            --spinner-border-top: #0056b3;
+            --table-bg: #3c3c3c;
+            --table-header-bg: #4a4a4a;
+            --table-header-color: #e0e0e0;
+            --table-border-color: #555;
+            --table-row-hover-bg: #4a4a4a;
+            --search-border: #555;
+            --search-focus-border: #0056b3;
+            --switch-bg: #555;
+            --switch-slider-bg: #e0e0e0;
+            --switch-checked-bg: #0056b3;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f7f6;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background-color: #fff;
+            background-color: var(--container-bg);
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s;
         }
         h1 {
             text-align: center;
-            color: #2c3e50;
+            color: var(--h1-color);
             margin-bottom: 30px;
         }
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .search-container {
+            flex-grow: 1;
+            min-width: 200px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--search-border);
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--search-focus-border);
+        }
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--switch-bg);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--switch-slider-bg);
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--switch-checked-bg);
+        }
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+
         .tabs {
             display: flex;
             flex-wrap: wrap;
@@ -36,19 +155,19 @@
             padding: 10px 20px;
             border: none;
             border-radius: 25px;
-            background-color: #e0e0e0;
-            color: #555;
+            background-color: var(--tab-btn-bg);
+            color: var(--tab-btn-color);
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 1rem;
         }
         .tab-btn:hover {
-            background-color: #c0c0c0;
+            background-color: var(--tab-btn-hover-bg);
         }
         .tab-btn.active {
-            background-color: #007bff;
-            color: white;
+            background-color: var(--tab-btn-active-bg);
+            color: var(--tab-btn-active-color);
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
         }
         .loading-spinner {
@@ -58,7 +177,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             border: 6px solid rgba(0, 0, 0, 0.1);
-            border-top: 6px solid #007bff;
+            border-top: 6px solid var(--spinner-border-top);
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -76,25 +195,28 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            background-color: #fff;
+            background-color: var(--table-bg);
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            transition: background-color 0.3s;
         }
         th, td {
             padding: 12px 15px;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--table-border-color);
+            transition: border-color 0.3s;
         }
         th {
-            background-color: #f8f9fa;
-            color: #495057;
+            background-color: var(--table-header-bg);
+            color: var(--table-header-color);
             font-weight: 700;
             cursor: pointer;
             position: relative;
+            transition: background-color 0.3s, color 0.3s;
         }
         th:hover {
-            background-color: #e9ecef;
+            background-color: var(--tab-btn-hover-bg);
         }
         th.sortable::after {
             content: '';
@@ -110,13 +232,13 @@
         }
         th.sortable.asc::after {
             transform: rotate(180deg);
-            border-top-color: #007bff;
+            border-top-color: var(--tab-btn-active-bg);
         }
         th.sortable.desc::after {
-            border-top-color: #007bff;
+            border-top-color: var(--tab-btn-active-bg);
         }
         tbody tr:hover {
-            background-color: #f1f1f1;
+            background-color: var(--table-row-hover-bg);
         }
         .text-center {
             text-align: center;
@@ -125,6 +247,19 @@
 </head>
 <body>
     <div class="container">
+        <div class="header-controls">
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Szukaj filmu...">
+            </div>
+            <div class="theme-switch-wrapper">
+                <span>Jasny</span>
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" />
+                    <div class="slider round"></div>
+                </label>
+                <span>Ciemny</span>
+            </div>
+        </div>
         <h1>Filmy w TV</h1>
         <div id="tabs" class="tabs"></div>
         <div class="loading-spinner" id="loading-spinner"></div>
@@ -148,8 +283,31 @@
     </div>
 
     <script>
-        let currentMovies = [];
+        let allMovies = []; // Stores all movies for the selected day
+        let currentMovies = []; // Stores movies after filtering/sorting
         let currentSort = { field: "r", order: "desc" }; // Default sorting: Ocena, high to low
+        let currentSearchTerm = "";
+
+        // Theme switch logic
+        const themeToggle = document.getElementById('checkbox');
+        const body = document.body;
+
+        // Load saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', () => {
+            if (themeToggle.checked) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        });
 
         function generateDates() {
             const today = new Date();
@@ -186,6 +344,8 @@
                 tab.addEventListener("click", function () {
                     document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
                     this.classList.add("active");
+                    currentSearchTerm = ""; // Clear search on date change
+                    document.getElementById("search-input").value = "";
                     fetchMovies(this.dataset.date);
                 });
                 tabsContainer.appendChild(tab);
@@ -208,8 +368,8 @@
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                currentMovies = await response.json();
-                updateTable(currentMovies);
+                allMovies = await response.json(); // Store all fetched movies
+                applyFiltersAndSort(); // Apply current search and sort
             } catch (error) {
                 console.error("Error fetching movies:", error);
                 document.getElementById("movie-list").innerHTML = `<tr><td colspan="6" class="text-center">Brak danych dla wybranego dnia</td></tr>`;
@@ -218,12 +378,21 @@
             }
         }
 
-        function updateTable(movies) {
-            const tableBody = document.getElementById('movie-list');
-            tableBody.innerHTML = '';
+        function applyFiltersAndSort() {
+            let moviesToDisplay = [...allMovies]; // Start with all fetched movies
 
-            // Sort movies based on currentSort
-            movies.sort((a, b) => {
+            // Apply search filter
+            if (currentSearchTerm) {
+                const searchTermLower = currentSearchTerm.toLowerCase();
+                moviesToDisplay = moviesToDisplay.filter(movie =>
+                    Object.values(movie).some(value =>
+                        String(value).toLowerCase().includes(searchTermLower)
+                    )
+                );
+            }
+
+            // Apply sort
+            moviesToDisplay.sort((a, b) => {
                 const field = currentSort.field;
                 const order = currentSort.order;
                 const aVal = a[field] === "" || a[field] == null ? (order === "asc" ? -Infinity : Infinity) : (typeof a[field] === 'string' ? a[field].toLowerCase() : a[field]);
@@ -234,8 +403,16 @@
                 return 0;
             });
 
+            currentMovies = moviesToDisplay; // Update currentMovies after filtering and sorting
+            updateTable(currentMovies);
+        }
+
+        function updateTable(movies) {
+            const tableBody = document.getElementById('movie-list');
+            tableBody.innerHTML = '';
+
             if (movies.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center">Brak danych dla wybranego dnia</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center">Brak danych dla wybranego dnia lub pasujących do wyszukiwania.</td></tr>`;
                 return;
             }
 
@@ -261,6 +438,7 @@
             });
         }
 
+        // Event listener for column header click for sorting
         document.querySelectorAll("th.sortable").forEach(header => {
             header.addEventListener("click", () => {
                 const field = header.dataset.sort;
@@ -269,8 +447,14 @@
                 } else {
                     currentSort = { field, order: "asc" };
                 }
-                updateTable(currentMovies);
+                applyFiltersAndSort(); // Re-apply sort to current filtered movies
             });
+        });
+
+        // Event listener for search input
+        document.getElementById("search-input").addEventListener("input", (event) => {
+            currentSearchTerm = event.target.value;
+            applyFiltersAndSort(); // Apply filter based on search term
         });
 
         // Initialize tabs and load default day's data
