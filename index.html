@@ -287,7 +287,7 @@
             const dates = [];
             for (let i = -3; i <= 3; i++) {
                 const date = new Date(today.getTime()); // Create a copy of today's timestamp
-                date.setDate(today.getDate() + i); // Add 'i' days to this copy
+                date.setDate(date.getDate() + i); // Add 'i' days to this copy
                 const formattedDate = date.toISOString().split('T')[0];
                 dates.push({ value: formattedDate });
             }
