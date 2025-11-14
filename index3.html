@@ -43,10 +43,10 @@
             --icon-color: #e0e0e0;
             --icon-active-color: #0056b3;
 
-            /* Date specific colors for dark mode */
-            --date-today-color: #218838; /* Darker Green */
-            --date-past-color: #c82333; /* Darker Red */
-            --date-future-color: #0056b3; /* Darker Blue */
+            /* Date specific colors for dark mode - lighter shades */
+            --date-today-color: #66bb6a; /* Lighter Green */
+            --date-past-color: #ef5350; /* Lighter Red */
+            --date-future-color: #42a5f5; /* Lighter Blue */
         }
 
         body {
@@ -197,9 +197,11 @@
         }
         .date-past {
             color: var(--date-past-color);
+            font-weight: bold; /* Ensure boldness */
         }
         .date-future {
             color: var(--date-future-color);
+            font-weight: bold; /* Ensure boldness */
         }
         .date-cell {
             line-height: 1.4;
