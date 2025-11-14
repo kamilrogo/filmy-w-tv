@@ -285,12 +285,22 @@
 
         function generateDates() {
             const dates = [];
+            console.log("--- generateDates() START ---");
+            console.log("today (normalized):", today.toISOString());
+            console.log("today.getFullYear():", today.getFullYear());
+            console.log("today.getMonth():", today.getMonth());
+            console.log("today.getDate():", today.getDate());
+
             for (let i = -3; i <= 3; i++) {
                 const date = new Date(today.getTime()); // Create a copy of today's timestamp
+                console.log(`  i=${i}: date (copy of today) before setDate:`, date.toISOString());
                 date.setDate(date.getDate() + i); // Add 'i' days to this copy
                 const formattedDate = date.toISOString().split('T')[0];
+                console.log(`  i=${i}: date after setDate:`, date.toISOString());
+                console.log(`  i=${i}: formattedDate:`, formattedDate);
                 dates.push({ value: formattedDate });
             }
+            console.log("--- generateDates() END ---");
             return dates;
         }
 
