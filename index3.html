@@ -10,11 +10,6 @@
             --text-color: #333;
             --container-bg: #fff;
             --h1-color: #2c3e50;
-            --tab-btn-bg: #e0e0e0; /* No longer used for tabs, but keeping for consistency if needed elsewhere */
-            --tab-btn-color: #555;
-            --tab-btn-hover-bg: #c0c0c0;
-            --tab-btn-active-bg: #007bff;
-            --tab-btn-active-color: white;
             --spinner-border-top: #007bff;
             --table-bg: #fff;
             --table-header-bg: #f8f9fa;
@@ -23,9 +18,6 @@
             --table-row-hover-bg: #f1f1f1;
             --search-border: #ccc;
             --search-focus-border: #007bff;
-            --switch-bg: #ccc; /* No longer used for switch, but keeping for consistency if needed elsewhere */
-            --switch-slider-bg: #fff; /* No longer used for switch, but keeping for consistency if needed elsewhere */
-            --switch-checked-bg: #007bff; /* No longer used for switch, but keeping for consistency if needed elsewhere */
             --icon-color: #555;
             --icon-active-color: #007bff;
 
@@ -40,11 +32,6 @@
             --text-color: #e0e0e0;
             --container-bg: #3c3c3c;
             --h1-color: #f0f0f0;
-            --tab-btn-bg: #555;
-            --tab-btn-color: #e0e0e0;
-            --tab-btn-hover-bg: #666;
-            --tab-btn-active-bg: #0056b3;
-            --tab-btn-active-color: white;
             --spinner-border-top: #0056b3;
             --table-bg: #3c3c3c;
             --table-header-bg: #4a4a4a;
@@ -53,9 +40,6 @@
             --table-row-hover-bg: #4a4a4a;
             --search-border: #555;
             --search-focus-border: #0056b3;
-            --switch-bg: #555;
-            --switch-slider-bg: #e0e0e0;
-            --switch-checked-bg: #0056b3;
             --icon-color: #e0e0e0;
             --icon-active-color: #0056b3;
 
@@ -71,7 +55,7 @@
             padding: 20px;
             background-color: var(--bg-color);
             color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
+            /* Removed transition for instant theme change */
         }
         .container {
             max-width: 1200px;
@@ -80,7 +64,7 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            transition: background-color 0.3s;
+            /* Removed transition for instant theme change */
         }
         h1 {
             text-align: center;
@@ -92,7 +76,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* Allows items to wrap on smaller screens */
             gap: 15px;
         }
         .search-container {
@@ -106,7 +90,7 @@
             border: 1px solid var(--search-border);
             border-radius: 25px;
             font-size: 1rem;
-            transition: border-color 0.3s;
+            /* Removed transition for instant theme change */
             background-color: var(--container-bg);
             color: var(--text-color);
         }
@@ -123,7 +107,7 @@
             align-items: center;
             justify-content: center;
             color: var(--icon-color); /* Default icon color */
-            transition: color 0.3s;
+            /* Removed transition for instant theme change */
         }
         .theme-toggle-button:hover {
             color: var(--icon-active-color);
@@ -163,13 +147,13 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-            transition: background-color 0.3s;
+            /* Removed transition for instant theme change */
         }
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid var(--table-border-color);
-            transition: border-color 0.3s;
+            /* Removed transition for instant theme change */
         }
         th {
             background-color: var(--table-header-bg);
@@ -177,10 +161,10 @@
             font-weight: 700;
             cursor: pointer;
             position: relative;
-            transition: background-color 0.3s, color 0.3s;
+            /* Removed transition for instant theme change */
         }
         th:hover {
-            background-color: var(--tab-btn-hover-bg);
+            background-color: var(--table-row-hover-bg); /* Using table-row-hover-bg for consistency */
         }
         th.sortable::after {
             content: '';
@@ -196,10 +180,10 @@
         }
         th.sortable.asc::after {
             transform: rotate(180deg);
-            border-top-color: var(--tab-btn-active-bg);
+            border-top-color: var(--icon-active-color); /* Using icon-active-color for consistency */
         }
         th.sortable.desc::after {
-            border-top-color: var(--tab-btn-active-bg);
+            border-top-color: var(--icon-active-color); /* Using icon-active-color for consistency */
         }
         tbody tr:hover {
             background-color: var(--table-row-hover-bg);
@@ -219,6 +203,9 @@
         }
         .date-cell {
             line-height: 1.4;
+        }
+        .date-cell span {
+            white-space: nowrap; /* Prevent line breaks for date and time */
         }
     </style>
 </head>
