@@ -26,6 +26,8 @@
             --switch-bg: #ccc;
             --switch-slider-bg: #fff;
             --switch-checked-bg: #007bff;
+            --icon-color: #555;
+            --icon-active-color: #007bff;
         }
 
         body.dark-mode {
@@ -49,6 +51,8 @@
             --switch-bg: #555;
             --switch-slider-bg: #e0e0e0;
             --switch-checked-bg: #0056b3;
+            --icon-color: #e0e0e0;
+            --icon-active-color: #0056b3;
         }
 
         body {
@@ -84,6 +88,7 @@
         .search-container {
             flex-grow: 1;
             min-width: 200px;
+            max-width: 400px; /* Limit search bar width */
         }
         .search-input {
             width: 100%;
@@ -142,6 +147,18 @@
         }
         input:checked + .slider:before {
             transform: translateX(16px);
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: var(--icon-color);
+            transition: fill 0.3s;
+        }
+        input:checked ~ .icon.moon {
+            fill: var(--icon-active-color);
+        }
+        input:not(:checked) ~ .icon.sun {
+            fill: var(--icon-active-color);
         }
 
         .tabs {
@@ -252,12 +269,12 @@
                 <input type="text" id="search-input" class="search-input" placeholder="Szukaj filmu...">
             </div>
             <div class="theme-switch-wrapper">
-                <span>Jasny</span>
+                <svg class="icon sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                 <label class="theme-switch" for="checkbox">
                     <input type="checkbox" id="checkbox" />
                     <div class="slider round"></div>
                 </label>
-                <span>Ciemny</span>
+                <svg class="icon moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             </div>
         </div>
         <h1>Filmy w TV</h1>
@@ -273,20 +290,22 @@
                         <th class="sortable" data-sort="g">Gatunek</th>
                         <th class="sortable" data-sort="i">Kraj</th>
                         <th class="sortable" data-sort="r">Ocena</th>
+                        <th class="sortable" data-sort="dayLabel">Dzień</th> <!-- New column for day -->
                     </tr>
                 </thead>
                 <tbody id="movie-list">
-                    <tr><td colspan="6" class="text-center">Wybierz dzień, aby zobaczyć filmy.</td></tr>
+                    <tr><td colspan="7" class="text-center">Wybierz dzień, aby zobaczyć filmy.</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        let allMovies = []; // Stores all movies for the selected day
-        let currentMovies = []; // Stores movies after filtering/sorting
+        let allFetchedMovies = []; // Stores all movies for all fetched days
+        let currentFilteredMovies = []; // Stores movies after filtering by date tab
         let currentSort = { field: "r", order: "desc" }; // Default sorting: Ocena, high to low
         let currentSearchTerm = "";
+        let currentActiveDate = ""; // To keep track of the currently active date tab
 
         // Theme switch logic
         const themeToggle = document.getElementById('checkbox');
@@ -338,15 +357,16 @@
                 tab.className = "tab-btn";
                 if (index === 3) { // Default to "Dziś"
                     tab.classList.add("active");
+                    currentActiveDate = date.value;
                 }
                 tab.textContent = date.label;
                 tab.dataset.date = date.value;
+                tab.dataset.label = date.label; // Store label for display
                 tab.addEventListener("click", function () {
                     document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
                     this.classList.add("active");
-                    currentSearchTerm = ""; // Clear search on date change
-                    document.getElementById("search-input").value = "";
-                    fetchMovies(this.dataset.date);
+                    currentActiveDate = this.dataset.date;
+                    applyFiltersAndSort(); // Re-apply filters and sort based on new active date
                 });
                 tabsContainer.appendChild(tab);
             });
@@ -361,30 +381,42 @@
             }
         }
 
-        async function fetchMovies(date) {
+        async function fetchAllDaysMovies() {
             toggleLoading(true);
-            try {
-                const response = await fetch(`data/${date}.json`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            const dates = generateDates();
+            const fetchPromises = dates.map(async (dateObj) => {
+                try {
+                    const response = await fetch(`data/${dateObj.value}.json`);
+                    if (!response.ok) {
+                        console.warn(`No data for ${dateObj.value}, skipping.`);
+                        return [];
+                    }
+                    const movies = await response.json();
+                    return movies.map(movie => ({ ...movie, date: dateObj.value, dayLabel: dateObj.label }));
+                } catch (error) {
+                    console.error(`Error fetching movies for ${dateObj.value}:`, error);
+                    return [];
                 }
-                allMovies = await response.json(); // Store all fetched movies
-                applyFiltersAndSort(); // Apply current search and sort
-            } catch (error) {
-                console.error("Error fetching movies:", error);
-                document.getElementById("movie-list").innerHTML = `<tr><td colspan="6" class="text-center">Brak danych dla wybranego dnia</td></tr>`;
-            } finally {
-                toggleLoading(false);
-            }
+            });
+
+            const results = await Promise.all(fetchPromises);
+            allFetchedMovies = results.flat(); // Flatten array of arrays into a single array
+            applyFiltersAndSort(); // Initial display after fetching all data
+            toggleLoading(false);
         }
 
         function applyFiltersAndSort() {
-            let moviesToDisplay = [...allMovies]; // Start with all fetched movies
+            let moviesToProcess = [...allFetchedMovies];
+
+            // Filter by active date tab first
+            if (currentActiveDate) {
+                moviesToProcess = moviesToProcess.filter(movie => movie.date === currentActiveDate);
+            }
 
             // Apply search filter
             if (currentSearchTerm) {
                 const searchTermLower = currentSearchTerm.toLowerCase();
-                moviesToDisplay = moviesToDisplay.filter(movie =>
+                moviesToProcess = moviesToProcess.filter(movie =>
                     Object.values(movie).some(value =>
                         String(value).toLowerCase().includes(searchTermLower)
                     )
@@ -392,7 +424,7 @@
             }
 
             // Apply sort
-            moviesToDisplay.sort((a, b) => {
+            moviesToProcess.sort((a, b) => {
                 const field = currentSort.field;
                 const order = currentSort.order;
                 const aVal = a[field] === "" || a[field] == null ? (order === "asc" ? -Infinity : Infinity) : (typeof a[field] === 'string' ? a[field].toLowerCase() : a[field]);
@@ -403,8 +435,8 @@
                 return 0;
             });
 
-            currentMovies = moviesToDisplay; // Update currentMovies after filtering and sorting
-            updateTable(currentMovies);
+            currentFilteredMovies = moviesToProcess; // Update currentFilteredMovies
+            updateTable(currentFilteredMovies);
         }
 
         function updateTable(movies) {
@@ -412,7 +444,7 @@
             tableBody.innerHTML = '';
 
             if (movies.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center">Brak danych dla wybranego dnia lub pasujących do wyszukiwania.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center">Brak danych dla wybranego dnia lub pasujących do wyszukiwania.</td></tr>`;
                 return;
             }
 
@@ -425,6 +457,7 @@
                     <td>${movie.g || ''}</td>
                     <td>${movie.i || ''}</td>
                     <td>${movie.r || '-'}</td>
+                    <td>${movie.dayLabel || ''}</td> <!-- Display day label -->
                 `;
                 tableBody.appendChild(row);
             });
@@ -457,9 +490,9 @@
             applyFiltersAndSort(); // Apply filter based on search term
         });
 
-        // Initialize tabs and load default day's data
+        // Initialize tabs and fetch all days' data
         populateTabs();
-        fetchMovies(generateDates().find(date => date.label === "Dziś").value);
+        fetchAllDaysMovies();
     </script>
 </body>
 </html>
