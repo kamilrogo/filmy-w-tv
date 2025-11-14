@@ -10,7 +10,7 @@
             --text-color: #333;
             --container-bg: #fff;
             --h1-color: #2c3e50;
-            --tab-btn-bg: #e0e0e0;
+            --tab-btn-bg: #e0e0e0; /* No longer used for tabs, but keeping for consistency if needed elsewhere */
             --tab-btn-color: #555;
             --tab-btn-hover-bg: #c0c0c0;
             --tab-btn-active-bg: #007bff;
@@ -28,6 +28,11 @@
             --switch-checked-bg: #007bff;
             --icon-color: #555;
             --icon-active-color: #007bff;
+
+            /* Date specific colors */
+            --date-today-color: #28a745; /* Green */
+            --date-past-color: #dc3545; /* Red */
+            --date-future-color: #007bff; /* Blue */
         }
 
         body.dark-mode {
@@ -53,6 +58,11 @@
             --switch-checked-bg: #0056b3;
             --icon-color: #e0e0e0;
             --icon-active-color: #0056b3;
+
+            /* Date specific colors for dark mode */
+            --date-today-color: #218838; /* Darker Green */
+            --date-past-color: #c82333; /* Darker Red */
+            --date-future-color: #0056b3; /* Darker Blue */
         }
 
         body {
@@ -161,32 +171,8 @@
             fill: var(--icon-active-color);
         }
 
-        .tabs {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 30px;
-            gap: 10px;
-        }
-        .tab-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
-            background-color: var(--tab-btn-bg);
-            color: var(--tab-btn-color);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-        }
-        .tab-btn:hover {
-            background-color: var(--tab-btn-hover-bg);
-        }
-        .tab-btn.active {
-            background-color: var(--tab-btn-active-bg);
-            color: var(--tab-btn-active-color);
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-        }
+        /* Removed .tabs and .tab-btn styles as they are no longer used */
+
         .loading-spinner {
             display: none; /* Hidden by default */
             position: fixed;
@@ -260,6 +246,19 @@
         .text-center {
             text-align: center;
         }
+        .date-today {
+            color: var(--date-today-color);
+            font-weight: bold;
+        }
+        .date-past {
+            color: var(--date-past-color);
+        }
+        .date-future {
+            color: var(--date-future-color);
+        }
+        .date-cell {
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -278,23 +277,22 @@
             </div>
         </div>
         <h1>Filmy w TV</h1>
-        <div id="tabs" class="tabs"></div>
+        <!-- Removed tabs div -->
         <div class="loading-spinner" id="loading-spinner"></div>
         <div class="table-container">
             <table id="movie-table">
                 <thead>
                     <tr>
-                        <th class="sortable" data-sort="h">Godzina</th>
+                        <th class="sortable" data-sort="fullDate">Data</th> <!-- Combined Date column -->
                         <th class="sortable" data-sort="c">Kanał</th>
                         <th class="sortable" data-sort="t">Tytuł</th>
                         <th class="sortable" data-sort="g">Gatunek</th>
                         <th class="sortable" data-sort="i">Kraj</th>
                         <th class="sortable" data-sort="r">Ocena</th>
-                        <th class="sortable" data-sort="dayLabel">Dzień</th> <!-- New column for day -->
                     </tr>
                 </thead>
                 <tbody id="movie-list">
-                    <tr><td colspan="7" class="text-center">Wybierz dzień, aby zobaczyć filmy.</td></tr>
+                    <tr><td colspan="6" class="text-center">Ładowanie filmów...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -302,10 +300,10 @@
 
     <script>
         let allFetchedMovies = []; // Stores all movies for all fetched days
-        let currentFilteredMovies = []; // Stores movies after filtering by date tab
         let currentSort = { field: "r", order: "desc" }; // Default sorting: Ocena, high to low
         let currentSearchTerm = "";
-        let currentActiveDate = ""; // To keep track of the currently active date tab
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize today's date for comparison
 
         // Theme switch logic
         const themeToggle = document.getElementById('checkbox');
@@ -329,47 +327,14 @@
         });
 
         function generateDates() {
-            const today = new Date();
             const dates = [];
             for (let i = -3; i <= 3; i++) {
                 const date = new Date(today);
                 date.setDate(today.getDate() + i);
                 const formattedDate = date.toISOString().split('T')[0];
-                let label;
-                if (i === -3) label = "-3";
-                else if (i === -2) label = "-2";
-                else if (i === -1) label = "-1";
-                else if (i === 0) label = "Dziś";
-                else if (i === 1) label = "+1";
-                else if (i === 2) label = "+2";
-                else if (i === 3) label = "+3";
-                dates.push({ label, value: formattedDate });
+                dates.push({ value: formattedDate });
             }
             return dates;
-        }
-
-        function populateTabs() {
-            const tabsContainer = document.getElementById("tabs");
-            const dates = generateDates();
-            tabsContainer.innerHTML = ''; // Clear existing tabs
-            dates.forEach((date, index) => {
-                const tab = document.createElement("button");
-                tab.className = "tab-btn";
-                if (index === 3) { // Default to "Dziś"
-                    tab.classList.add("active");
-                    currentActiveDate = date.value;
-                }
-                tab.textContent = date.label;
-                tab.dataset.date = date.value;
-                tab.dataset.label = date.label; // Store label for display
-                tab.addEventListener("click", function () {
-                    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-                    this.classList.add("active");
-                    currentActiveDate = this.dataset.date;
-                    applyFiltersAndSort(); // Re-apply filters and sort based on new active date
-                });
-                tabsContainer.appendChild(tab);
-            });
         }
 
         function toggleLoading(show) {
@@ -392,7 +357,7 @@
                         return [];
                     }
                     const movies = await response.json();
-                    return movies.map(movie => ({ ...movie, date: dateObj.value, dayLabel: dateObj.label }));
+                    return movies.map(movie => ({ ...movie, date: dateObj.value, fullDate: `${dateObj.value} ${movie.h}` }));
                 } catch (error) {
                     console.error(`Error fetching movies for ${dateObj.value}:`, error);
                     return [];
@@ -408,11 +373,6 @@
         function applyFiltersAndSort() {
             let moviesToProcess = [...allFetchedMovies];
 
-            // Filter by active date tab first
-            if (currentActiveDate) {
-                moviesToProcess = moviesToProcess.filter(movie => movie.date === currentActiveDate);
-            }
-
             // Apply search filter
             if (currentSearchTerm) {
                 const searchTermLower = currentSearchTerm.toLowerCase();
@@ -427,16 +387,30 @@
             moviesToProcess.sort((a, b) => {
                 const field = currentSort.field;
                 const order = currentSort.order;
-                const aVal = a[field] === "" || a[field] == null ? (order === "asc" ? -Infinity : Infinity) : (typeof a[field] === 'string' ? a[field].toLowerCase() : a[field]);
-                const bVal = b[field] === "" || b[field] == null ? (order === "asc" ? -Infinity : Infinity) : (typeof b[field] === 'string' ? b[field].toLowerCase() : b[field]);
+
+                let aVal, bVal;
+
+                if (field === "fullDate") {
+                    // Custom sort for combined date and time
+                    aVal = new Date(`${a.date}T${a.h}`);
+                    bVal = new Date(`${b.date}T${b.h}`);
+                } else if (field === "r") {
+                    // Handle 'Ocena' as a number, treating empty/null as -Infinity
+                    aVal = a[field] === "" || a[field] == null ? -Infinity : parseFloat(a[field]);
+                    bVal = b[field] === "" || b[field] == null ? -Infinity : parseFloat(b[field]);
+                } else {
+                    // Default string/number comparison
+                    aVal = a[field] === "" || a[field] == null ? (order === "asc" ? "" : "zzzzzz") : (typeof a[field] === 'string' ? a[field].toLowerCase() : a[field]);
+                    bVal = b[field] === "" || b[field] == null ? (order === "asc" ? "" : "zzzzzz") : (typeof b[field] === 'string' ? b[field].toLowerCase() : b[field]);
+                }
+
 
                 if (aVal < bVal) return order === "asc" ? -1 : 1;
                 if (aVal > bVal) return order === "asc" ? 1 : -1;
                 return 0;
             });
 
-            currentFilteredMovies = moviesToProcess; // Update currentFilteredMovies
-            updateTable(currentFilteredMovies);
+            updateTable(moviesToProcess);
         }
 
         function updateTable(movies) {
@@ -444,20 +418,34 @@
             tableBody.innerHTML = '';
 
             if (movies.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="7" class="text-center">Brak danych dla wybranego dnia lub pasujących do wyszukiwania.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center">Brak danych lub pasujących do wyszukiwania.</td></tr>`;
                 return;
             }
 
             movies.forEach(movie => {
+                const movieDate = new Date(movie.date);
+                movieDate.setHours(0, 0, 0, 0); // Normalize for comparison
+
+                let dateClass = '';
+                if (movieDate.getTime() === today.getTime()) {
+                    dateClass = 'date-today';
+                } else if (movieDate < today) {
+                    dateClass = 'date-past';
+                } else {
+                    dateClass = 'date-future';
+                }
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${movie.h || ''}</td>
+                    <td class="date-cell">
+                        <span class="${dateClass}">${movie.date || ''}</span><br>
+                        <span>${movie.h || ''}</span>
+                    </td>
                     <td>${movie.c || ''}</td>
                     <td>${movie.t || ''}</td>
                     <td>${movie.g || ''}</td>
                     <td>${movie.i || ''}</td>
                     <td>${movie.r || '-'}</td>
-                    <td>${movie.dayLabel || ''}</td> <!-- Display day label -->
                 `;
                 tableBody.appendChild(row);
             });
@@ -490,8 +478,7 @@
             applyFiltersAndSort(); // Apply filter based on search term
         });
 
-        // Initialize tabs and fetch all days' data
-        populateTabs();
+        // Initial fetch all days' data
         fetchAllDaysMovies();
     </script>
 </body>
