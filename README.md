@@ -1,17 +1,19 @@
-# Filmy w TV - Your Daily Movie Guide!
+# Filmy w TV - Twój Codzienny Przewodnik Filmowy!
 
-Welcome to Filmy w TV, your personal, super-fast guide to what's showing on TV! This sleek web app helps you quickly find movies across a 7-day window (3 days back, today, and 3 days forward).
+Witaj w Filmy w TV, Twoim osobistym, superszybkim przewodniku po tym, co leci w telewizji! Ta elegancka aplikacja internetowa pomoże Ci szybko znaleźć filmy w 7-dniowym oknie (3 dni wstecz, dziś i 3 dni do przodu).
 
-## ✨ Features
+## ✨ Funkcje
 
-*   **Instant Overview:** See all movies for the week at a glance.
-*   **Smart Search:** Find your favorite films with a powerful, all-encompassing search.
-*   **Effortless Sorting:** Sort by time, channel, title, genre, country, or even rating with a single click.
-*   **Stylish Themes:** Switch between light and dark modes to suit your viewing preference.
-*   **Clear Dates:** Dates are color-coded (today, past, future) for easy navigation.
+*   **Natychmiastowy Przegląd:** Zobacz wszystkie filmy na cały tydzień na pierwszy rzut oka.
+*   **Inteligentne Wyszukiwanie:** Znajdź swoje ulubione filmy dzięki potężnej, wszechstronnej wyszukiwarce.
+*   **Łatwe Sortowanie:** Sortuj według godziny, kanału, tytułu, gatunku, kraju, a nawet oceny jednym kliknięciem.
+*   **Stylowe Motywy:** Przełączaj się między trybem jasnym a ciemnym, aby dopasować wygląd do swoich preferencji.
+*   **Przejrzyste Daty:** Daty są oznaczone kolorami (dziś, przeszłość, przyszłość) dla łatwej nawigacji.
 
-## 🚀 How to Use
+## 🚀 Jak Używać
 
-Simply open `index.html` in your web browser. That's it! No complex setup, just pure movie-browsing bliss.
+Odwiedź stronę: [https://kamilrogo.github.io/filmy-w-tv/](https://kamilrogo.github.io/filmy-w-tv/)
 
-Enjoy your movie marathon planning! 🍿
+To wszystko! Bez skomplikowanej konfiguracji, po prostu czysta przyjemność planowania filmowego maratonu.
+
+Miłego planowania filmowego maratonu! 🍿
