@@ -248,9 +248,7 @@
         let currentSort = { field: "r", order: "desc" }; // Default sorting: Ocena, high to low
         let currentSearchTerm = "";
         const today = new Date();
-        // console.log("Initial 'today' (before normalization):", today); // Debug log
         today.setHours(0, 0, 0, 0); // Normalize today's date for comparison
-        // console.log("Normalized 'today':", today); // Debug log
 
         // Theme toggle button logic
         const themeToggleButton = document.getElementById('theme-toggle-button');
@@ -288,10 +286,9 @@
         function generateDates() {
             const dates = [];
             for (let i = -3; i <= 3; i++) {
-                // Corrected date generation: create a new date object by adding 'i' days to today's date
-                const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+                const date = new Date(today.getTime()); // Create a copy of today's timestamp
+                date.setDate(today.getDate() + i); // Add 'i' days to this copy
                 const formattedDate = date.toISOString().split('T')[0];
-                // console.log(`Generated date for i=${i}:`, formattedDate); // Debug log
                 dates.push({ value: formattedDate });
             }
             return dates;
