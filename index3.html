@@ -392,9 +392,9 @@
                     dateClass = 'date-future';
                 }
 
-                // Format date to DD-MM
+                // Format date to DD.MM
                 const [year, month, day] = movie.date.split('-');
-                const formattedDate = `${day}-${month}`;
+                const formattedDate = `${day}.${month}`;
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
