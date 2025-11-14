@@ -23,9 +23,9 @@
             --table-row-hover-bg: #f1f1f1;
             --search-border: #ccc;
             --search-focus-border: #007bff;
-            --switch-bg: #ccc;
-            --switch-slider-bg: #fff;
-            --switch-checked-bg: #007bff;
+            --switch-bg: #ccc; /* No longer used for switch, but keeping for consistency if needed elsewhere */
+            --switch-slider-bg: #fff; /* No longer used for switch, but keeping for consistency if needed elsewhere */
+            --switch-checked-bg: #007bff; /* No longer used for switch, but keeping for consistency if needed elsewhere */
             --icon-color: #555;
             --icon-active-color: #007bff;
 
@@ -114,64 +114,25 @@
             outline: none;
             border-color: var(--search-focus-border);
         }
-        .theme-switch-wrapper {
+        .theme-toggle-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            color: var(--icon-color); /* Default icon color */
+            transition: color 0.3s;
         }
-        .theme-switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 24px;
-        }
-        .theme-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--switch-bg);
-            transition: .4s;
-            border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: var(--switch-slider-bg);
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: var(--switch-checked-bg);
-        }
-        input:checked + .slider:before {
-            transform: translateX(16px);
+        .theme-toggle-button:hover {
+            color: var(--icon-active-color);
         }
         .icon {
-            width: 20px;
-            height: 20px;
-            fill: var(--icon-color);
-            transition: fill 0.3s;
+            width: 24px; /* Slightly larger icons for better tap target */
+            height: 24px;
+            fill: currentColor; /* Use currentColor to inherit from parent */
         }
-        input:checked ~ .icon.moon {
-            fill: var(--icon-active-color);
-        }
-        input:not(:checked) ~ .icon.sun {
-            fill: var(--icon-active-color);
-        }
-
-        /* Removed .tabs and .tab-btn styles as they are no longer used */
 
         .loading-spinner {
             display: none; /* Hidden by default */
@@ -267,17 +228,12 @@
             <div class="search-container">
                 <input type="text" id="search-input" class="search-input" placeholder="Szukaj filmu...">
             </div>
-            <div class="theme-switch-wrapper">
+            <button id="theme-toggle-button" class="theme-toggle-button">
                 <svg class="icon sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                <label class="theme-switch" for="checkbox">
-                    <input type="checkbox" id="checkbox" />
-                    <div class="slider round"></div>
-                </label>
                 <svg class="icon moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            </div>
+            </button>
         </div>
         <h1>Filmy w TV</h1>
-        <!-- Removed tabs div -->
         <div class="loading-spinner" id="loading-spinner"></div>
         <div class="table-container">
             <table id="movie-table">
@@ -305,25 +261,37 @@
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Normalize today's date for comparison
 
-        // Theme switch logic
-        const themeToggle = document.getElementById('checkbox');
+        // Theme toggle button logic
+        const themeToggleButton = document.getElementById('theme-toggle-button');
         const body = document.body;
+        const sunIcon = themeToggleButton.querySelector('.icon.sun');
+        const moonIcon = themeToggleButton.querySelector('.icon.moon');
+
+        function setIconsVisibility() {
+            if (body.classList.contains('dark-mode')) {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'inline-block';
+            } else {
+                sunIcon.style.display = 'inline-block';
+                moonIcon.style.display = 'none';
+            }
+        }
 
         // Load saved theme preference
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             body.classList.add('dark-mode');
-            themeToggle.checked = true;
         }
+        setIconsVisibility(); // Set initial icon visibility
 
-        themeToggle.addEventListener('change', () => {
-            if (themeToggle.checked) {
-                body.classList.add('dark-mode');
+        themeToggleButton.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
                 localStorage.setItem('theme', 'dark');
             } else {
-                body.classList.remove('dark-mode');
                 localStorage.setItem('theme', 'light');
             }
+            setIconsVisibility(); // Update icon visibility after toggle
         });
 
         function generateDates() {
@@ -435,10 +403,14 @@
                     dateClass = 'date-future';
                 }
 
+                // Format date to DD-MM
+                const [year, month, day] = movie.date.split('-');
+                const formattedDate = `${day}-${month}`;
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="date-cell">
-                        <span class="${dateClass}">${movie.date || ''}</span><br>
+                        <span class="${dateClass}">${formattedDate || ''}</span><br>
                         <span>${movie.h || ''}</span>
                     </td>
                     <td>${movie.c || ''}</td>
